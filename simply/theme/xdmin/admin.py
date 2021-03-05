@@ -50,4 +50,10 @@ class ThemeAdmin(admin.ModelAdmin):
 
     list_display = ('name', 'active',)
 
+    def save_model(self, request, obj, form, change):
+        Theme.objects.filter(active=True).update(active=False)
+
+        return super().save_model(request, obj, form, change)
+
+
 admin.site.register(Theme, ThemeAdmin)
