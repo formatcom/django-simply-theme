@@ -3,6 +3,5 @@
 __pycache__
 dist
 build
-demo
 env
 db.*
