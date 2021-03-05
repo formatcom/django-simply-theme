@@ -8,6 +8,23 @@ class ThemeAdminForm(forms.ModelForm):
         model = Theme
         fields = '__all__'
         widgets = {
+                'branding_bg_color': admin.widgets.AdminTextInputWidget(
+                        attrs={
+                            'type': 'color',
+                        }),
+                'branding_text_color': admin.widgets.AdminTextInputWidget(
+                        attrs={
+                            'type': 'color',
+                        }),
+                'branding_link_color': admin.widgets.AdminTextInputWidget(
+                        attrs={
+                            'type': 'color',
+                        }),
+                'branding_link_hover_color': admin.widgets.AdminTextInputWidget(
+                        attrs={
+                            'type': 'color',
+                        }),
+
                 'header_bg_color': admin.widgets.AdminTextInputWidget(
                         attrs={
                             'type': 'color',
@@ -21,6 +38,40 @@ class ThemeAdminForm(forms.ModelForm):
                             'type': 'color',
                         }),
                 'header_link_hover_color': admin.widgets.AdminTextInputWidget(
+                        attrs={
+                            'type': 'color',
+                        }),
+
+                'breadcrumbs_bg_color': admin.widgets.AdminTextInputWidget(
+                        attrs={
+                            'type': 'color',
+                        }),
+                'breadcrumbs_text_color': admin.widgets.AdminTextInputWidget(
+                        attrs={
+                            'type': 'color',
+                        }),
+                'breadcrumbs_link_color': admin.widgets.AdminTextInputWidget(
+                        attrs={
+                            'type': 'color',
+                        }),
+                'breadcrumbs_link_hover_color': admin.widgets.AdminTextInputWidget(
+                        attrs={
+                            'type': 'color',
+                        }),
+
+                'module_bg_color': admin.widgets.AdminTextInputWidget(
+                        attrs={
+                            'type': 'color',
+                        }),
+                'module_text_color': admin.widgets.AdminTextInputWidget(
+                        attrs={
+                            'type': 'color',
+                        }),
+                'module_link_color': admin.widgets.AdminTextInputWidget(
+                        attrs={
+                            'type': 'color',
+                        }),
+                'module_link_hover_color': admin.widgets.AdminTextInputWidget(
                         attrs={
                             'type': 'color',
                         }),
