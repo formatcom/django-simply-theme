@@ -13,7 +13,8 @@ from simply.theme.branding.models import Branding
 
 class SimplyThemeMiddleware:
 
-    queryset = Theme.objects.filter(active=True)
+    theme = Theme.objects.filter(active=True)
+    branding = Branding.objects.filter(active=True)
 
     default_site_header = admin.site.site_header
 
@@ -141,7 +142,7 @@ class SimplyThemeMiddleware:
         template = Template(self.head_template_code)
         context = Context({
             'simply': {
-                'theme': { 'xdmin': self.queryset.first(), },
+                'theme': { 'xdmin': self.theme.first(), },
             },
         })
 
@@ -149,18 +150,39 @@ class SimplyThemeMiddleware:
 
     def render_callback(self, response):
 
-        theme = self.queryset.first()
+        theme = self.theme.first()
 
         if not theme:
             admin.site.site_header = self.default_site_header
             return None
 
-        response.content = response.content.replace(b'</head>', self.get_head_content(), 1)
+        content = response.content
+
+        content = content.replace(b'</head>', self.get_head_content(), 1)
+
+        branding = self.branding.first()
 
         if theme.branding_title_use:
-            admin.site.site_header = theme.branding_title
+
+            title = theme.branding_title
+
+            if branding:
+                title = theme.branding_title.replace('[logo]', '[simply.logo]', 1)
+
+            admin.site.site_header = title
+
         else:
             admin.site.site_header = self.default_site_header
+
+
+        if branding:
+            logo = '<img src="{url} />"'.format(**{
+                'url': branding.logo.url,
+            }).encode()
+
+            content = content.replace(b'[simply.logo]', bytes(logo), 1)
+
+        response.content = content
 
     # REF: django/contrib/admin/sites.py _build_app_dict
     def build_module_dict(self, request):
@@ -222,6 +244,7 @@ class SimplyThemeMiddleware:
 
         return app_dict
 
+    # TODO: cache here
     def get_module_list(self, request):
         app_dict = self.build_module_dict(request)
 
@@ -242,9 +265,6 @@ class SimplyThemeMiddleware:
         if isinstance(response, TemplateResponse):
 
             response.add_post_render_callback(self.render_callback)
-
-            print(response.context_data.get('app_list'))
-            print('----')
 
             if response.context_data.get('app_list'):
                 response.context_data['app_list'] = self.get_module_list(request)

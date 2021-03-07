@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import validate_image_file_extension
+from django.core.validators import FileExtensionValidator
 from django.utils.translation import gettext_lazy as _
 
 
@@ -14,7 +14,7 @@ class Branding(models.Model):
 
     logo = models.FileField(
             upload_to="branding/logo/%Y/%m/%d",
-            validators=[validate_image_file_extension,])
+            validators=[FileExtensionValidator(['png', 'jpg', 'gif']),])
 
     class Meta:
         verbose_name = 'Logo'
