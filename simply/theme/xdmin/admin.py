@@ -7,11 +7,18 @@ from simply.theme.xdmin.forms import ThemeAdminForm
 
 class ThemeAdmin(admin.ModelAdmin):
 
+    app_module = 'simply.theme'
+
     form = ThemeAdminForm
+
+    prepopulated_fields = {'slug': ('name',)}
+
+    search_fields = ('name',)
+    list_filter = ('active',)
 
     fieldsets = (
             (None, {
-                'fields': ('name', 'active',)
+                'fields': ('name', 'slug', 'active',)
             }),
             (_('Branding'), {
                 'fields': (
@@ -48,7 +55,7 @@ class ThemeAdmin(admin.ModelAdmin):
             }),
     )
 
-    list_display = ('name', 'active',)
+    list_display = ('name', 'slug', 'active',)
 
     def save_model(self, request, obj, form, change):
         Theme.objects.filter(active=True).update(active=False)
@@ -57,3 +64,4 @@ class ThemeAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Theme, ThemeAdmin)
+

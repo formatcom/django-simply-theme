@@ -6,8 +6,13 @@ class Theme(models.Model):
 
     name = models.CharField(
             unique=True,
-            max_length=100,
+            max_length=50,
             verbose_name=_('name'))
+
+    slug = models.SlugField(
+            primary_key=True,
+            max_length=100,
+            verbose_name=_('slug'))
 
     active = models.BooleanField(
             verbose_name=_('active'))
@@ -152,6 +157,5 @@ class Theme(models.Model):
     module_link_hover_color_use = models.BooleanField(
             verbose_name=_('use'))
 
-
     def __str__(self):
-        return self.name
+        return self.slug
