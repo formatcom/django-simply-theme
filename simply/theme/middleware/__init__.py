@@ -270,7 +270,6 @@ class SimplyThemeMiddleware:
 
         if isinstance(response, TemplateResponse):
 
-            print(self.theme)
             if self.theme:
                 response.add_post_render_callback(self.render_callback)
 
