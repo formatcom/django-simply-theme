@@ -7,14 +7,17 @@ from django.utils.text import capfirst
 from django.template import Context
 from django.template.response import TemplateResponse
 
-from simply.theme.xdmin.models import Theme
-from simply.theme.branding.models import Branding
+if apps.is_installed('simply.theme.xdmin'):
+    from simply.theme.xdmin.models import Theme
+
+if apps.is_installed('simply.theme.branding'):
+    from simply.theme.branding.models import Branding
 
 
 class SimplyThemeMiddleware:
 
-    theme = Theme.objects.filter(active=True)
-    branding = Branding.objects.filter(active=True)
+    theme = None
+    branding = None
 
     default_site_header = admin.site.site_header
 
@@ -160,7 +163,9 @@ class SimplyThemeMiddleware:
 
         content = content.replace(b'</head>', self.get_head_content(), 1)
 
-        branding = self.branding.first()
+        branding = None
+        if self.branding:
+            branding = self.branding.first()
 
         if theme.branding_title_use:
 
@@ -175,6 +180,7 @@ class SimplyThemeMiddleware:
             admin.site.site_header = self.default_site_header
 
 
+        # TODO: width height class
         if branding:
             logo = '<img src="{url} />"'.format(**{
                 'url': branding.logo.url,
@@ -264,7 +270,9 @@ class SimplyThemeMiddleware:
 
         if isinstance(response, TemplateResponse):
 
-            response.add_post_render_callback(self.render_callback)
+            print(self.theme)
+            if self.theme:
+                response.add_post_render_callback(self.render_callback)
 
             if response.context_data.get('app_list'):
                 response.context_data['app_list'] = self.get_module_list(request)
@@ -274,6 +282,13 @@ class SimplyThemeMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         # One-time configuration and initialization.
+
+        if apps.is_installed('simply.theme.xdmin'):
+            self.theme = Theme.objects.filter(active=True)
+
+        if apps.is_installed('simply.theme.branding'):
+            self.branding = Branding.objects.filter(active=True)
+
 
     def __call__(self, request):
         # Code to be executed for each request before
