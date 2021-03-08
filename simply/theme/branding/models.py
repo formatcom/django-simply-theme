@@ -14,7 +14,9 @@ class Branding(models.Model):
 
     logo = models.FileField(
             upload_to="branding/logo/%Y/%m/%d",
-            validators=[FileExtensionValidator(['png', 'jpg', 'gif']),])
+            validators=[FileExtensionValidator(['png', 'jpg', 'gif']),],
+            help_text=_('max height 45px')
+    )
 
     class Meta:
         verbose_name = 'Logo'

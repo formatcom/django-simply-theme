@@ -151,27 +151,15 @@ class SimplyThemeMiddleware:
 
         return bytes(template.render(context).encode())
 
-    def render_callback(self, response):
+    def patch_branding(self):
 
         theme = self.theme.first()
 
-        if not theme:
-            admin.site.site_header = self.default_site_header
-            return None
-
-        content = response.content
-
-        content = content.replace(b'</head>', self.get_head_content(), 1)
-
-        branding = None
-        if self.branding:
-            branding = self.branding.first()
-
-        if theme.branding_title_use:
+        if theme and theme.branding_title_use:
 
             title = theme.branding_title
 
-            if branding:
+            if self.branding.first():
                 title = theme.branding_title.replace('[logo]', '[simply.logo]', 1)
 
             admin.site.site_header = title
@@ -180,9 +168,17 @@ class SimplyThemeMiddleware:
             admin.site.site_header = self.default_site_header
 
 
+    def render_callback(self, response):
+
+        content = response.content
+
+        content = content.replace(b'</head>', self.get_head_content(), 1)
+
+        branding = self.branding.first()
+
         # TODO: width height class
         if branding:
-            logo = '<img src="{url} />"'.format(**{
+            logo = '<img src="{url}" style="max-height:45px" />'.format(**{
                 'url': branding.logo.url,
             }).encode()
 
@@ -265,13 +261,12 @@ class SimplyThemeMiddleware:
 
     def process_template_response(self, request, response):
 
-        if not request.path.startswith(reverse('admin:index')):
+        if not self.admin:
             return response
 
         if isinstance(response, TemplateResponse):
 
-            if self.theme:
-                response.add_post_render_callback(self.render_callback)
+            response.add_post_render_callback(self.render_callback)
 
             if response.context_data.get('app_list'):
                 response.context_data['app_list'] = self.get_module_list(request)
@@ -292,6 +287,11 @@ class SimplyThemeMiddleware:
     def __call__(self, request):
         # Code to be executed for each request before
         # the view (and later middleware) are called.
+
+        self.admin = request.path.startswith(reverse('admin:index'))
+
+        if self.admin:
+            self.patch_branding()
 
         response = self.get_response(request)
 
