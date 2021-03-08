@@ -163,9 +163,9 @@ class SimplyThemeMiddleware:
         else:
             admin.site.site_header = self.default_site_header
 
-
-    # TODO: valid self.branding is None
     def render_callback(self, response):
+        if not self.branding:
+            return None
 
         content = response.content
 
