@@ -7,12 +7,6 @@ from django.utils.text import capfirst
 from django.template import Context
 from django.template.response import TemplateResponse
 
-if apps.is_installed('simply.theme.xdmin'):
-    from simply.theme.xdmin.models import Theme
-
-if apps.is_installed('simply.theme.branding'):
-    from simply.theme.branding.models import Branding
-
 
 class SimplyThemeMiddleware:
 
@@ -140,6 +134,7 @@ class SimplyThemeMiddleware:
         </head>
     '''
 
+    # TODO: valid self.theme is None
     def get_head_content(self):
 
         template = Template(self.head_template_code)
@@ -151,6 +146,7 @@ class SimplyThemeMiddleware:
 
         return bytes(template.render(context).encode())
 
+    # TODO: cache here, valid self.theme, self.branding is None
     def patch_branding(self):
 
         theme = self.theme.first()
@@ -168,6 +164,7 @@ class SimplyThemeMiddleware:
             admin.site.site_header = self.default_site_header
 
 
+    # TODO: valid self.branding is None
     def render_callback(self, response):
 
         content = response.content
@@ -278,9 +275,11 @@ class SimplyThemeMiddleware:
         # One-time configuration and initialization.
 
         if apps.is_installed('simply.theme.xdmin'):
+            from simply.theme.xdmin.models import Theme
             self.theme = Theme.objects.filter(active=True)
 
         if apps.is_installed('simply.theme.branding'):
+            from simply.theme.branding.models import Branding
             self.branding = Branding.objects.filter(active=True)
 
 
