@@ -164,14 +164,14 @@ class SimplyThemeMiddleware:
             admin.site.site_header = self.default_site_header
 
     def render_callback(self, response):
-        if not self.branding:
-            return None
-
         content = response.content
 
         content = content.replace(b'</head>', self.get_head_content(), 1)
 
-        branding = self.branding.first()
+        branding = None
+
+        if self.branding:
+            branding = self.branding.first()
 
         # TODO: width height class
         if branding:
